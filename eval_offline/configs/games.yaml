@@ -1,0 +1,29 @@
+suites:
+  aime:
+    concurrent: true
+    years: [2025, 2026]
+    n_samples_per_prompt: 64
+    temperature: 1.0
+    top_p: 0.95
+    top_k: 20
+    max_tokens: 32768
+
+  gpqa_diamond:
+    concurrent: true
+    n_samples_per_prompt: 8
+    temperature: 0.7
+    top_p: 0.95
+    max_tokens: 32768
+    max_concurrent: 32
+
+  livecodebench:
+    concurrent: true
+    n_samples_per_prompt: 1
+    temperature: 0.2
+    top_p: 0.95
+    max_tokens: 16384
+    max_concurrent: 16
+    release_version: "release_v6"
+
+  gem:
+    config_path: eval_offline/configs/_games_gem.yaml

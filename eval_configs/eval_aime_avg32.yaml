@@ -1,0 +1,21 @@
+eval:
+  defaults:
+    n_samples_per_eval_prompt: 32
+    temperature: 0.7           # official non-thinking (was 1.0)
+    top_p: 0.8                 # official non-thinking (was 0.95)
+    top_k: 20
+    max_response_len: 32768
+    input_key: prompt
+    label_key: label
+
+  datasets:
+
+    - name: aime2025
+      path: ${WORKSPACE_DIR}/aime-2025/aime-2025.jsonl
+      n_samples_per_eval_prompt: 32
+      max_response_len: 32768
+
+    - name: aime2026
+      path: ${WORKSPACE_DIR}/aime-2026/aime-2026.jsonl
+      n_samples_per_eval_prompt: 32
+      max_response_len: 32768

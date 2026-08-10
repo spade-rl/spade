@@ -1,0 +1,122 @@
+# RG hard split (RQ1 "Games" table) — all 100 reasoning_gym tasks of the
+# canonical hard split (reasoning_gym paper arXiv:2505.24760, Appendix A.3),
+# enumerated individually. Grouped below by Golden Goose category for
+# readability only: the four reported columns (Math / Algorithmic / Cognition /
+# Logic) are rolled up by gem_evaluator via RG_GOLDEN_GOOSE and emitted as
+# gem_eval/category_rg_<bucket>/win_rate. The bucket names themselves are NOT
+# registered environments, so they must never appear as task_ids here.
+#
+# Per-task episodes/turns/sampling mirror the settings used for the paper runs.
+gem_eval:
+  defaults:
+    episodes: 8
+    max_turns: 2
+    temperature: 0.6
+    max_tokens: 8192
+    max_concurrent: 64
+
+  tasks:
+    # ---- Math (31 tasks) ----
+    - { task_id: "rg:complex_arithmetic-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:intermediate_integration-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:polynomial_equations-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:polynomial_multiplication-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:simple_equations-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:simple_integration-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:basic_arithmetic-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:bitwise_arithmetic-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:calendar_arithmetic-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:chain_sum-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:count_bits-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:decimal_arithmetic-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:decimal_chain_sum-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:dice-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:fraction_simplification-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:gcd-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:gsm_symbolic-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:lcm-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:leg_counting-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:number_format-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:power_function-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:prime_factorization-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:products-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:time_intervals-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:advanced_geometry-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:simple_geometry-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:course_schedule-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:family_relationships-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:largest_island-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:quantum_lock-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:shortest_path-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    # ---- Algorithmic (36 tasks) ----
+    - { task_id: "rg:ab-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:base_conversion-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:binary_alternation-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:binary_matrix-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:caesar_cipher-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:count_primes-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:cryptarithm-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:game_of_life-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:game_of_life_halting-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:graph_color-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:group_anagrams-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:isomorphic_strings-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:jugs-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:letter_counting-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:letter_jumble-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:manipulate_matrix-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:number_filtering-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:number_sorting-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:palindrome_generation-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:palindrome_partitioning-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:pool_matrix-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:ransom_note-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:rotate_matrix-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:rotten_oranges-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:sentence_reordering-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:spell_backward-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:spiral_matrix-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:string_insertion-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:string_manipulation-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:string_splitting-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:string_synthesis-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:word_ladder-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:word_sequence_reversal-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:word_sorting-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:bf-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:codeio-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    # ---- Cognition (24 tasks) ----
+    - { task_id: "rg:arc_1d-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:arc_agi-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:rearc-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:color_cube_rotation-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:figlet_font-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:modulo_grid-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:needle_haystack-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:number_sequence-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:rectangle_count-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:rubiks_cube-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:countdown-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:emoji_mystery-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:futoshiki-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:knight_swap-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:mahjong_puzzle-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:maze-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:mini_sudoku-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:n_queens-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:puzzle24-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:rush_hour-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:sokoban-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:sudoku-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:tower_of_hanoi-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:tsumego-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    # ---- Logic (9 tasks) ----
+    - { task_id: "rg:acre-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:list_functions-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:aiw-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:circuit_logic-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:knights_knaves-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:propositional_logic-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:self_reference-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:syllogism-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }
+    - { task_id: "rg:zebra_puzzles-hard", episodes: 8, max_turns: 2, temperature: 0.6, max_tokens: 8192 }

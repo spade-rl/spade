@@ -1,0 +1,20 @@
+# Fixture: only tau2_eval section, no gem_eval. Exercises standalone
+# tau2 loading path and graceful-skip of the gem branch.
+tau2_eval:
+  defaults:
+    max_concurrency: 16
+    num_trials: 1
+    max_steps: 50
+    agent_temperature: 1.0
+    agent_max_tokens: 2048
+    user_llm: "openrouter/openai/gpt-5-mini"
+    user_temperature: 0.0
+    user_max_tokens: 1024
+
+  tasks:
+    - domain: retail
+      split: test
+    - domain: telecom
+      split: test
+      max_concurrency: 8   # per-spec override
+      truncate: 2

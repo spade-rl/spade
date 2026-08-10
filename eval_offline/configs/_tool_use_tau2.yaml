@@ -1,0 +1,20 @@
+tau2_eval:
+  defaults:
+    max_concurrency: 48
+    num_trials: 4
+    max_steps: 200
+    agent_temperature: 0.0
+    agent_top_p: 0.8
+    agent_top_k: 20
+    agent_max_tokens: 16384
+    user_llm: "openai/gpt-4.1"
+    user_temperature: 0.0
+    user_max_tokens: 2048
+
+  tasks:
+    - domain: retail
+      split: base
+    - domain: telecom
+      split: base
+    - domain: airline
+      split: base

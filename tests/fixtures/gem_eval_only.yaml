@@ -1,0 +1,13 @@
+# Fixture: only gem_eval section, no tau2. Exercises tau2 loader's
+# graceful skip when section is absent.
+gem_eval:
+  defaults:
+    episodes: 2
+    max_turns: 10
+    temperature: 1.0
+    max_tokens: 2048
+    max_concurrent: 4
+
+  tasks:
+    - task_id: "rg:graph_color-easy"
+      episodes: 2

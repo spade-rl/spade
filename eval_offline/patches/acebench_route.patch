@@ -1,0 +1,47 @@
+--- a/model_inference/apimodel_inference.py
++++ b/model_inference/apimodel_inference.py
+@@ -1,6 +1,8 @@
+ import os
+
++from dotenv import load_dotenv
++
+ class APIModelInference:
+     def __init__(self, model_name, model_path=None, temperature=0.001, top_p=1, max_tokens=1000, max_dialog_turns=40, user_model="gpt-4o", language="zh") -> None:
+         super().__init__(model_name, model_path, temperature, top_p, max_tokens, language)
+
+-        load_dotenv()
++        load_dotenv()  # SPARE_PATCH_MARKER
+
+         if "gpt" in self.model_name:
+             api_key = os.getenv("GPT_AGENT_API_KEY")
+             base_url = os.getenv("GPT_BASE_URL")
+         elif "deepseek-r1" in self.model_name:
+             api_key = os.getenv("DEEPSEEK_API_KEY")
+             base_url = os.getenv("DEEPSEEK_BASE_URL")
+         elif "o1" in self.model_name:
+             api_key = os.getenv("GPT_AGENT_API_KEY")
+             base_url = os.getenv("GPT_BASE_URL")
++        else:
++            api_key = os.getenv("ACEBENCH_AGENT_API_KEY", "EMPTY")
++            base_url = os.getenv("ACEBENCH_AGENT_BASE_URL")
+
+         self.client = OpenAI(base_url=base_url, api_key=api_key)
+--- a/model_inference/inference_map.py
++++ b/model_inference/inference_map.py
+@@ -1,5 +1,14 @@
++import os
++
+ inference_map = {model: handler for handler, models in inference_map_groups.items() for model in models}
++
++_original_getitem = inference_map.__class__.__getitem__
++
++
++class _DefaultAPIInferenceMap(dict):
++    """Inference map that falls back to APIModelInference for unknown model names."""
++
++    def __missing__(self, key):
++        from model_inference.apimodel_inference import APIModelInference
++        return APIModelInference
++
++
++inference_map = _DefaultAPIInferenceMap(inference_map)

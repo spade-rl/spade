@@ -1,0 +1,25 @@
+suites:
+  bfcl_full:
+    # BFCL model handle for the 4B checkpoints. 8B / 30B runs MUST override it
+    # with the BFCL_MODEL_HANDLE environment variable (it takes precedence over
+    # this value), otherwise their results are generated and labelled as 4B.
+    model_handle: "Qwen/Qwen3-4B-Instruct-2507-FC"
+    categories: [non_live, live, multi_turn]
+    num_threads: 16
+    temperature: 0.0
+
+  tau2:
+    concurrent: true
+    config_path: eval_offline/configs/_tool_use_tau2.yaml
+
+  acebench:
+    concurrent: true
+    language: en
+    category: test_all
+    enable_thinking: true
+    temperature: 0.7
+    top_p: 1.0
+    max_tokens: 16384
+    num_threads: 16
+    max_dialog_turns: 40
+    user_model: gpt-4o

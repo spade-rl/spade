@@ -1,0 +1,158 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "spare"
+version = "0.1.0"
+description = "SPADE: Self-Play in Adaptive Synthetic Executable Environments"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = { paths = ["LICENSE", "THIRD_PARTY_NOTICES.md", "LICENSES/Apache-2.0.txt"] }
+keywords = ["reinforcement-learning", "curriculum-learning", "single-agent", "synthetic-games"]
+authors = [
+  { name = "Bo Liu", email = "benjaminliu.eecs@gmail.com" },
+  { name = "Simon Yu", email = "simon011130@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Core dependencies.
+# gem-llm publishes `requires-python = "<=3.12,>=3.10"` on every release, so
+# pip rejects it on 3.12.1 and newer (3.12.1 is *not* <= 3.12 under PEP 440).
+# The environment marker keeps `pip install -e .` working on those
+# interpreters; GEM environment support then has to be installed manually:
+#   pip install --ignore-requires-python gem-llm
+# Python 3.10/3.11 (or exactly 3.12.0) get it automatically.
+dependencies = [
+  "numpy>=1.24.0",
+  "openai>=1.0.0",
+  "PyYAML>=6.0",
+  "tqdm>=4.65.0",
+  "transformers>=4.44",
+  'gem-llm; python_full_version <= "3.12.0"',
+  "math_verify",
+  "weave",
+]
+
+[project.optional-dependencies]
+# Tinker backend dependencies.
+# `tinker` is the Thinking Machines SDK (github.com/thinking-machines-lab/tinker)
+# and `chz` is the OpenAI config library (github.com/openai/chz) used by the
+# Tinker launcher; `torch` is imported directly by spare/tinker/train_step.py.
+# `tinker_cookbook` is NOT installed from PyPI: this repo pins it as a git
+# submodule, so install it from the checkout instead —
+#   git submodule update --init tinker-cookbook
+#   pip install -e ./tinker-cookbook
+# See cmd/tinker/README.md. All Tinker upstreams require Python >= 3.11.
+tinker = [
+  "chz",
+  "tinker",
+  "torch",
+]
+
+# Development dependencies
+dev = [
+  "coverage[toml]>=7.0.0",
+  "pytest>=7.0.0",
+  "ruff>=0.12.0",
+  "black>=23.0.0",
+  "isort>=5.12.0",
+  "mypy>=1.0.0",
+  "pylint>=2.17.0",
+]
+
+# Evaluation-only extras.
+# tau2 is distributed from git (not PyPI) and pins requires-python to
+# >=3.12,<3.14. All 249 source files parse cleanly under 3.10, so in
+# practice we install with pip's --ignore-requires-python flag on the
+# slime training env:
+#   pip install --ignore-requires-python "spare[eval]"
+# NOTE: tau2 data files (tasks.json, policy.md, ...) are NOT bundled in
+# the git install — clone tau2-bench separately and set TAU2_DATA_DIR.
+eval = [
+  "datasets>=2.0",
+  "httpx>=0.24",
+  "requests>=2.28",
+  "tau2 @ git+https://github.com/sierra-research/tau2-bench.git",
+]
+
+# All dependencies.
+# Inherits the Tinker extra's Python >= 3.11 floor and the tau2 caveat above.
+all = [
+  "spare[tinker,eval]",
+]
+
+# Full development setup
+full = [
+  "spare[all,dev]",
+  "wandb>=0.15.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/spade-rl/spade"
+Documentation = "https://github.com/spade-rl/spade#readme"
+Issues = "https://github.com/spade-rl/spade/issues"
+Source = "https://github.com/spade-rl/spade"
+
+# Allow PEP 508 direct (git/url) references in optional-dependencies, e.g.
+# tau2 evaluation dependency. Without this, hatchling rejects metadata builds.
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["spare"]
+
+[tool.black]
+line-length = 100
+target-version = ['py310']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+extend-exclude = [
+  "slime",
+  "spare/core/eval/codecontest_prime_scorer",
+  "spare/external",
+  "tinker-cookbook",
+]
+
+[tool.ruff.lint]
+select = ["E9", "F"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "eval_offline/tests", "eval_offline/suites/tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
+[tool.coverage.run]
+source_pkgs = ["spare", "tests"]
+branch = true
+parallel = true
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]

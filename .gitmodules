@@ -1,0 +1,6 @@
+[submodule "slime"]
+	path = slime
+	url = https://github.com/THUDM/slime.git
+[submodule "tinker-cookbook"]
+	path = tinker-cookbook
+	url = https://github.com/thinking-machines-lab/tinker-cookbook.git

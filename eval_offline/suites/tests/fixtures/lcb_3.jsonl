@@ -1,0 +1,3 @@
+{"problem_id": "p1", "prompt": "Write a Python function `add(a, b)` that returns a+b.", "function_name": "add", "tests": [{"input": "(1, 2)", "expected": "3"}, {"input": "(0, 0)", "expected": "0"}]}
+{"problem_id": "p2", "prompt": "Write a Python function `square(x)` that returns x*x.", "function_name": "square", "tests": [{"input": "(3,)", "expected": "9"}, {"input": "(0,)", "expected": "0"}]}
+{"problem_id": "p3", "prompt": "Write a Python function `is_even(n)` that returns True iff n is even.", "function_name": "is_even", "tests": [{"input": "(2,)", "expected": "True"}, {"input": "(3,)", "expected": "False"}]}

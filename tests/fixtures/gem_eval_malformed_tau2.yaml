@@ -1,0 +1,11 @@
+# Fixture: tau2_eval section with a malformed entry (missing `split`).
+# Exercises the ValueError path in load_tau2_eval_config.
+tau2_eval:
+  defaults:
+    max_concurrency: 16
+
+  tasks:
+    - domain: retail
+      split: test
+    - domain: telecom
+      # intentionally missing `split` → should raise ValueError
