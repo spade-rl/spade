@@ -82,23 +82,22 @@ class SpadeReasoningGymEnv(ReasoningGymEnv):
     ) -> Tuple[str, SupportsFloat, bool, bool, dict[str, Any]]:
         """Score the rollout against reasoning_gym's ``score_answer``.
 
-        GEM's base ``ReasoningGymEnv.step`` extracts the answer with
-        ``extract_last_boxed_answer`` (i.e. ``\\boxed{}``), but the rg eval
-        prompt (and the reasoning_gym SYSTEM_PROMPTS convention) instructs the
-        model to answer inside ``<answer>...</answer>`` tags — so the boxed
-        extractor never matched and EVERY rg task scored 0.0 regardless of
-        correctness. We extract the ``<answer>`` payload (the format the prompt
-        asks for; e.g. the JSON coloring map for graph_color) and pass it to
-        ``score_answer``. Falls back to ``\\boxed{}`` for the
-        RG_USE_BOXED_PROMPT path.
+        The question asks for the final answer in ``\\boxed{}`` (see reset()
+        and the rg prompt in gem_evaluator), so the last ``\\boxed{}`` is the
+        answer. Models that still use reasoning_gym's ``<answer>`` tags are
+        scored on the tag payload, with a ``\\boxed{}`` inside it unwrapped:
+        grading ``<answer>\\boxed{x}</answer>`` verbatim marked correct
+        answers wrong.
         """
-        matches = re.findall(
-            r"<answer>\s*(.*?)\s*</answer>", action, re.DOTALL | re.IGNORECASE
-        )
-        if matches:
-            clean_action = matches[-1].strip()
-        else:
-            clean_action = extract_last_boxed_answer(action)
+        clean_action = extract_last_boxed_answer(action)
+        if clean_action is None:
+            matches = re.findall(
+                r"<answer>\s*(.*?)\s*</answer>", action, re.DOTALL | re.IGNORECASE
+            )
+            if matches:
+                clean_action = matches[-1].strip()
+        if clean_action is not None:
+            clean_action = clean_action.strip()
         reward = self.reward_fn(answer=clean_action, entry=self.data)
         return TERMINAL_STATE, reward, True, True, {}
 
