@@ -98,7 +98,13 @@ class SpadeReasoningGymEnv(ReasoningGymEnv):
                 clean_action = matches[-1].strip()
         if clean_action is not None:
             clean_action = clean_action.strip()
-        reward = self.reward_fn(answer=clean_action, entry=self.data)
+        try:
+            reward = self.reward_fn(answer=clean_action, entry=self.data)
+        except Exception:  # noqa: BLE001
+            # Some scorers raise on answers they cannot parse (prime_factorization
+            # on "2 \\times 3"); that is a wrong answer, not a failed episode,
+            # which the evaluator would drop from win_rate.
+            reward = 0.0
         return TERMINAL_STATE, reward, True, True, {}
 
     def spawn(self, same_state: bool = False, **kwargs: Any) -> Env:
