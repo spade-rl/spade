@@ -235,7 +235,7 @@ class GemEvaluator:
             logger.error("[GEM-EVAL] Failed to create env for %s: %s", task_spec.task_id, e)
             raise
 
-        max_context = 32768  # Hard cap to prevent context explosion
+        max_context = task_spec.max_context  # prompt + generation cap per episode
 
         try:
             obs, info = env.reset(seed=episode_idx)
