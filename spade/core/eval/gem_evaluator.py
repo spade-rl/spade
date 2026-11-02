@@ -297,7 +297,7 @@ class GemEvaluator:
                     presence_penalty=0.0,
                     max_tokens=gen_max_tokens,
                     session_id=session_id,
-                ), timeout=600)
+                ), timeout=task_spec.generation_timeout)
 
                 result = results[0] if results else {}
                 response_text = result.get("text", "")

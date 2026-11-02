@@ -71,6 +71,9 @@ class GemEvalDefaults:
     max_tokens: int = 8192
     # Prompt + generated tokens per episode; the generation budget shrinks to fit.
     max_context: int = 32768
+    # Seconds per generation call. An episode that times out is counted as an
+    # error and left out of win_rate, so long-context tasks need a larger value.
+    generation_timeout: float = 600.0
     max_concurrent: int = 16
 
 
@@ -84,6 +87,7 @@ class GemTaskSpec:
     temperature: float = 1.0
     max_tokens: int = 8192
     max_context: int = 32768
+    generation_timeout: float = 600.0
     # `mcq_json` uses the Qwen3 model-card format for multiple-choice tasks.
     prompt_style: str = "default"
     # Distinguishes metrics when one task is evaluated with multiple prompts.
@@ -161,6 +165,7 @@ def load_gem_eval_config(config_path: str) -> tuple[GemEvalDefaults, List[GemTas
         temperature=defaults_dict.get("temperature", 1.0),
         max_tokens=defaults_dict.get("max_tokens", 8192),
         max_context=defaults_dict.get("max_context", 32768),
+        generation_timeout=defaults_dict.get("generation_timeout", 600.0),
         max_concurrent=defaults_dict.get("max_concurrent", 16),
     )
 
@@ -198,6 +203,7 @@ def load_gem_eval_config(config_path: str) -> tuple[GemEvalDefaults, List[GemTas
             temperature=overrides.get("temperature", defaults.temperature),
             max_tokens=overrides.get("max_tokens", defaults.max_tokens),
             max_context=min(overrides.get("max_context", defaults.max_context), context_cap),
+            generation_timeout=overrides.get("generation_timeout", defaults.generation_timeout),
             prompt_style=_prompt_style,
             metric_suffix=_metric_suffix,
         ))
