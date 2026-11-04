@@ -69,6 +69,11 @@ class GemEvalDefaults:
     max_turns: int = 40
     temperature: float = 1.0
     max_tokens: int = 8192
+    # Prompt + generated tokens per episode; the generation budget shrinks to fit.
+    max_context: int = 32768
+    # Seconds per generation call. An episode that times out is counted as an
+    # error and left out of win_rate, so long-context tasks need a larger value.
+    generation_timeout: float = 600.0
     max_concurrent: int = 16
 
 
@@ -81,6 +86,8 @@ class GemTaskSpec:
     max_turns: int = 40
     temperature: float = 1.0
     max_tokens: int = 8192
+    max_context: int = 32768
+    generation_timeout: float = 600.0
     # `mcq_json` uses the Qwen3 model-card format for multiple-choice tasks.
     prompt_style: str = "default"
     # Distinguishes metrics when one task is evaluated with multiple prompts.
@@ -157,8 +164,14 @@ def load_gem_eval_config(config_path: str) -> tuple[GemEvalDefaults, List[GemTas
         max_turns=defaults_dict.get("max_turns", 40),
         temperature=defaults_dict.get("temperature", 1.0),
         max_tokens=defaults_dict.get("max_tokens", 8192),
+        max_context=defaults_dict.get("max_context", 32768),
+        generation_timeout=defaults_dict.get("generation_timeout", 600.0),
         max_concurrent=defaults_dict.get("max_concurrent", 16),
     )
+
+    # GEM_MAX_CONTEXT caps every task for models with a shorter window
+    # (e.g. Qwen3-8B at 32K while the rg tasks allow 64K).
+    context_cap = int(os.environ.get("GEM_MAX_CONTEXT") or 10**9)
 
     # Parse tasks
     tasks_list = gem_eval.get("tasks", [])
@@ -189,6 +202,8 @@ def load_gem_eval_config(config_path: str) -> tuple[GemEvalDefaults, List[GemTas
             max_turns=overrides.get("max_turns", defaults.max_turns),
             temperature=overrides.get("temperature", defaults.temperature),
             max_tokens=overrides.get("max_tokens", defaults.max_tokens),
+            max_context=min(overrides.get("max_context", defaults.max_context), context_cap),
+            generation_timeout=overrides.get("generation_timeout", defaults.generation_timeout),
             prompt_style=_prompt_style,
             metric_suffix=_metric_suffix,
         ))

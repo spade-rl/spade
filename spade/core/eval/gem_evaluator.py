@@ -91,13 +91,10 @@ def _build_initial_prompt(
 ) -> str:
     """Build category-appropriate initial prompt.
 
-    For `rg` (reasoning_gym) tasks, mirrors the canonical RG paper prompt
-    (`reasoning_gym/utils.py:SYSTEM_PROMPTS["default"]`) which uses
-    `<answer></answer>` tags — paired with `RG_STRICT_EXTRACT=1` in
-    SpadeReasoningGymEnv.step() this gives published-comparable scores.
-
-    Set env var `RG_USE_BOXED_PROMPT=1` to fall back to the older
-    `\\boxed{}` prompt (legacy / lenient mode).
+    For `rg` (reasoning_gym) tasks, follows the RG paper prompt
+    (`reasoning_gym/utils.py:SYSTEM_PROMPTS["default"]`) but asks for the
+    answer in `\\boxed{}`, matching the env's own instruction and the scorer
+    in SpadeReasoningGymEnv.step().
 
     For multiple-choice tasks (e.g., GPQA-Diamond) Qwen3-4B-Instruct-2507
     model card recommends MCQ JSON format (`"answer": "C"`). Two ways to opt-in:
@@ -165,17 +162,18 @@ def _build_initial_prompt(
             f"Question: {observation}\n"
             "Please reason step by step, and put your final answer within \\boxed{{}}."
         )
-    if category == "rg" and os.environ.get("RG_USE_BOXED_PROMPT", "0") in ("0", "false", "False", ""):
+    if category == "rg":
+        # The observation already ends with "Put your final answer within
+        # \boxed{}." (SpadeReasoningGymEnv.reset); asking for <answer> tags as
+        # well made models nest the two, which the scorer graded as wrong.
         return (
             "Given a problem, your task is to answer the question by thinking "
             "step-by-step in a clear and specific manner.\n"
             f"Problem: {observation}\n"
-            "Once you have thought about the reasoning process, provide the "
-            "answer in the following format:\n"
-            "<answer>answer here</answer>\n"
-            "Do not explain your reasoning inside the answer tags, provide only "
-            "the final answer. When an example is provided, you should strictly "
-            "follow the format of the output/answer in that example."
+            "Once you have thought about the reasoning process, put only the "
+            "final answer within \\boxed{}, with no explanation inside it. When "
+            "an example is provided, you should strictly follow the format of "
+            "the output/answer in that example."
         )
     return (
         "You are playing a game. Make valid actions to win.\n"
@@ -237,7 +235,7 @@ class GemEvaluator:
             logger.error("[GEM-EVAL] Failed to create env for %s: %s", task_spec.task_id, e)
             raise
 
-        max_context = 32768  # Hard cap to prevent context explosion
+        max_context = task_spec.max_context  # prompt + generation cap per episode
 
         try:
             obs, info = env.reset(seed=episode_idx)
@@ -299,7 +297,7 @@ class GemEvaluator:
                     presence_penalty=0.0,
                     max_tokens=gen_max_tokens,
                     session_id=session_id,
-                ), timeout=600)
+                ), timeout=task_spec.generation_timeout)
 
                 result = results[0] if results else {}
                 response_text = result.get("text", "")
