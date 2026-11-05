@@ -8,6 +8,8 @@ Requires: pip install gem-llm
 """
 
 import logging
+import json
+import os
 import random
 import re
 import warnings
@@ -22,10 +24,43 @@ from gem.envs.registration import ENV_REGISTRY, EnvSpec
 from gem.envs.registration import register as gem_register
 from gem.utils.constants import TERMINAL_STATE
 from gem.utils.parsing import extract_last_boxed_answer
+from reasoning_gym.utils import extract_answer as rg_extract_answer
 
 from spade.core.envs.env_adapter import EnvironmentAdapter, EnvInstance
 
 logger = logging.getLogger(__name__)
+
+
+def rg_protocol() -> Optional[str]:
+    """RG_PROTOCOL selects the published Reasoning Gym eval protocol, if any.
+
+    ``nemo``: NVIDIA NeMo-Gym's reasoning_gym server (Golden Goose, arXiv
+    2601.22975): the bare question as the user turn. ``prorl``: ProRL (arXiv
+    2505.24864): reasoning_gym's default ``<answer>`` system prompt. Both score
+    the NeMo-Gym extraction with the continuous reasoning_gym reward. ``boxed``:
+    our ``\\boxed{}`` instruction with that same extraction and reward; with the
+    A.3 hard configs (eval_offline/configs/rg_gg_hard.yaml) this is the offline
+    Golden Goose eval, the closest of these to its Table 3 Qwen3-4B-Instruct row.
+    Unset keeps our own ``\\boxed{}`` prompt and grading.
+
+    RG_DUMP=<path> appends each scored episode (task, score, gold, extracted
+    answer, response) to that JSONL file.
+    """
+    p = os.environ.get("RG_PROTOCOL", "").strip().lower()
+    return p if p in ("nemo", "prorl", "boxed") else None
+
+
+def _nemo_gym_extract(text: str) -> str:
+    """NeMo-Gym ReasoningGymResourcesServer._extract_answer_from_response:
+    the last <answer> tag, else the FIRST \\boxed{} without nested braces, else
+    the whole response."""
+    extracted = rg_extract_answer(text, tag_name="answer")
+    if extracted is not None:
+        return extracted
+    boxed = re.search(r"\\boxed\{([^}]+)\}", text)
+    if boxed:
+        return boxed.group(1).strip()
+    return text.strip()
 
 
 class SpadeReasoningGymEnv(ReasoningGymEnv):
@@ -72,7 +107,9 @@ class SpadeReasoningGymEnv(ReasoningGymEnv):
                 data = next(self.ds_iter)
 
         # reasoning_gym's scorer expects boxed or tagged final answers.
-        question = data["question"] + "\n\nPut your final answer within \\boxed{}."
+        question = data["question"]
+        if rg_protocol() in (None, "boxed"):
+            question += "\n\nPut your final answer within \\boxed{}."
         self.idx += 1
         self.data = data
         return question, {}
@@ -89,6 +126,17 @@ class SpadeReasoningGymEnv(ReasoningGymEnv):
         grading ``<answer>\\boxed{x}</answer>`` verbatim marked correct
         answers wrong.
         """
+        if rg_protocol() is not None:
+            extracted = _nemo_gym_extract(action)
+            score = self._score(extracted)
+            dump_path = os.environ.get("RG_DUMP")
+            if dump_path:
+                with open(dump_path, "a") as f:
+                    f.write(json.dumps({
+                        "task": self.name, "score": score, "gold": str(self.data["answer"]),
+                        "extracted": extracted[:2000], "response": action,
+                    }) + "\n")
+            return TERMINAL_STATE, score, True, True, {}
         clean_action = extract_last_boxed_answer(action)
         if clean_action is None:
             matches = re.findall(
@@ -98,14 +146,16 @@ class SpadeReasoningGymEnv(ReasoningGymEnv):
                 clean_action = matches[-1].strip()
         if clean_action is not None:
             clean_action = clean_action.strip()
+        return TERMINAL_STATE, self._score(clean_action), True, True, {}
+
+    def _score(self, answer: Optional[str]) -> float:
         try:
-            reward = self.reward_fn(answer=clean_action, entry=self.data)
+            return float(self.reward_fn(answer=answer, entry=self.data))
         except Exception:  # noqa: BLE001
             # Some scorers raise on answers they cannot parse (prime_factorization
             # on "2 \\times 3"); that is a wrong answer, not a failed episode,
             # which the evaluator would drop from win_rate.
-            reward = 0.0
-        return TERMINAL_STATE, reward, True, True, {}
+            return 0.0
 
     def spawn(self, same_state: bool = False, **kwargs: Any) -> Env:
         merged_kwargs = {**self._extra_kwargs, **kwargs}
@@ -202,6 +252,27 @@ def _register_rg_hard_split() -> int:
 
 
 _register_rg_hard_split()
+
+
+def _register_rg_default_split() -> int:
+    """Register ``rg:<dataset>-default`` at reasoning_gym's default config, seed 42:
+    the difficulty NeMo-Gym's create_dataset.py and ProRL generate."""
+    from spade.core.eval.rg_a3_hard import A3_HARD_CONFIGS
+    n = 0
+    for name in A3_HARD_CONFIGS:
+        env_id = f"rg:{name}-default"
+        if env_id in ENV_REGISTRY:
+            continue
+        try:
+            gem_register(env_id, "spade.core.envs.gem_adapter:SpadeReasoningGymEnv", name=name, seed=42)
+            n += 1
+        except Exception as e:  # noqa: BLE001
+            logger.warning("[RG] could not register %s at default config: %s", env_id, e)
+    logger.info("[RG] registered %d rg:<task>-default envs (reasoning_gym default configs)", n)
+    return n
+
+
+_register_rg_default_split()
 
 # Use no-replacement sampling and complete test execution for CodeContest.
 # Direct assignment preserves the existing task ID and metric key.
