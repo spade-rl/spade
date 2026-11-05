@@ -8,6 +8,7 @@ Requires: pip install gem-llm
 """
 
 import logging
+import json
 import os
 import random
 import re
@@ -36,11 +37,17 @@ def rg_protocol() -> Optional[str]:
     ``nemo``: NVIDIA NeMo-Gym's reasoning_gym server (Golden Goose, arXiv
     2601.22975): the bare question as the user turn. ``prorl``: ProRL (arXiv
     2505.24864): reasoning_gym's default ``<answer>`` system prompt. Both score
-    the NeMo-Gym extraction with the continuous reasoning_gym reward. Unset
-    keeps our own ``\\boxed{}`` prompt and grading.
+    the NeMo-Gym extraction with the continuous reasoning_gym reward. ``boxed``:
+    our ``\\boxed{}`` instruction with that same extraction and reward; with the
+    A.3 hard configs (eval_offline/configs/rg_gg_hard.yaml) this is the offline
+    Golden Goose eval, the closest of these to its Table 3 Qwen3-4B-Instruct row.
+    Unset keeps our own ``\\boxed{}`` prompt and grading.
+
+    RG_DUMP=<path> appends each scored episode (task, score, gold, extracted
+    answer, response) to that JSONL file.
     """
     p = os.environ.get("RG_PROTOCOL", "").strip().lower()
-    return p if p in ("nemo", "prorl") else None
+    return p if p in ("nemo", "prorl", "boxed") else None
 
 
 def _nemo_gym_extract(text: str) -> str:
@@ -101,7 +108,7 @@ class SpadeReasoningGymEnv(ReasoningGymEnv):
 
         # reasoning_gym's scorer expects boxed or tagged final answers.
         question = data["question"]
-        if rg_protocol() is None:
+        if rg_protocol() in (None, "boxed"):
             question += "\n\nPut your final answer within \\boxed{}."
         self.idx += 1
         self.data = data
@@ -120,7 +127,16 @@ class SpadeReasoningGymEnv(ReasoningGymEnv):
         answers wrong.
         """
         if rg_protocol() is not None:
-            return TERMINAL_STATE, self._score(_nemo_gym_extract(action)), True, True, {}
+            extracted = _nemo_gym_extract(action)
+            score = self._score(extracted)
+            dump_path = os.environ.get("RG_DUMP")
+            if dump_path:
+                with open(dump_path, "a") as f:
+                    f.write(json.dumps({
+                        "task": self.name, "score": score, "gold": str(self.data["answer"]),
+                        "extracted": extracted[:2000], "response": action,
+                    }) + "\n")
+            return TERMINAL_STATE, score, True, True, {}
         clean_action = extract_last_boxed_answer(action)
         if clean_action is None:
             matches = re.findall(

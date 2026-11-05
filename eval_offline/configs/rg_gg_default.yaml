@@ -1,5 +1,5 @@
 # Reasoning Gym at reasoning_gym's default configs (seed 42), 16 samples per task,
-# ProRL sampling (T 0.6, top_p 0.95, 32K response). Run with RG_PROTOCOL=nemo|prorl.
+# ProRL sampling (T 0.6, top_p 0.95, 32K response). Run with RG_PROTOCOL=nemo|prorl|boxed.
 suites:
   gem:
     defaults:
