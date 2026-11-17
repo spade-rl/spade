@@ -12,7 +12,7 @@ Fixed-env GRPO means actor-only GRPO on the shared GPT-5.5 curated-game pool;
 it is distinct from the RLVE baseline. The three model entry points download
 and verify the same pool before invoking the common trainer. Set
 `HF_DATASET_REVISION` to override the pinned paper snapshot
-`e179a371bc7764dacf0bcee1f808100beb463137`.
+`383e4512938c148a7bef2e72b985075eea180647`.
 
 The adaptive SPADE launchers require `CORPUS_FILE=/path/to/games-corpus.jsonl`.
 The grounding corpus is not bundled because its authoritative public snapshot,

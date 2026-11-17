@@ -8,12 +8,16 @@ Requires: pip install gem-llm
 """
 
 import logging
+import json
+import os
 import random
 import re
 import warnings
 from typing import Any, List, Optional, SupportsFloat, Tuple
 
 import reasoning_gym as rg
+
+from spade.core.eval.rg_a3_hard import RgSplitUnavailable
 
 import gem
 from gem.core import Env
@@ -22,10 +26,40 @@ from gem.envs.registration import ENV_REGISTRY, EnvSpec
 from gem.envs.registration import register as gem_register
 from gem.utils.constants import TERMINAL_STATE
 from gem.utils.parsing import extract_last_boxed_answer
+from reasoning_gym.utils import extract_answer as rg_extract_answer
 
 from spade.core.envs.env_adapter import EnvironmentAdapter, EnvInstance
 
 logger = logging.getLogger(__name__)
+
+
+def rg_protocol() -> Optional[str]:
+    """``RG_PROTOCOL=boxed`` selects the Golden Goose eval protocol.
+
+    Our ``\\boxed{}`` instruction, scored with :func:`_nemo_gym_extract` and the
+    continuous reasoning_gym reward, sampled at top_p 0.95 with no top-k. Run it
+    over eval_offline/configs/rg_gg_hard.yaml (all 100 tasks) or
+    rg_gg_subset.yaml (the 79-task subset). Unset keeps our own ``\\boxed{}``
+    prompt and win-rate grading, which is what every other config uses.
+
+    RG_DUMP=<path> appends each scored episode (task, score, gold, extracted
+    answer, response) to that JSONL file.
+    """
+    p = os.environ.get("RG_PROTOCOL", "").strip().lower()
+    return p if p == "boxed" else None
+
+
+def _nemo_gym_extract(text: str) -> str:
+    """NeMo-Gym ReasoningGymResourcesServer._extract_answer_from_response:
+    the last <answer> tag, else the FIRST \\boxed{} without nested braces, else
+    the whole response."""
+    extracted = rg_extract_answer(text, tag_name="answer")
+    if extracted is not None:
+        return extracted
+    boxed = re.search(r"\\boxed\{([^}]+)\}", text)
+    if boxed:
+        return boxed.group(1).strip()
+    return text.strip()
 
 
 class SpadeReasoningGymEnv(ReasoningGymEnv):
@@ -72,7 +106,9 @@ class SpadeReasoningGymEnv(ReasoningGymEnv):
                 data = next(self.ds_iter)
 
         # reasoning_gym's scorer expects boxed or tagged final answers.
-        question = data["question"] + "\n\nPut your final answer within \\boxed{}."
+        question = data["question"]
+        if rg_protocol() in (None, "boxed"):
+            question += "\n\nPut your final answer within \\boxed{}."
         self.idx += 1
         self.data = data
         return question, {}
@@ -82,25 +118,43 @@ class SpadeReasoningGymEnv(ReasoningGymEnv):
     ) -> Tuple[str, SupportsFloat, bool, bool, dict[str, Any]]:
         """Score the rollout against reasoning_gym's ``score_answer``.
 
-        GEM's base ``ReasoningGymEnv.step`` extracts the answer with
-        ``extract_last_boxed_answer`` (i.e. ``\\boxed{}``), but the rg eval
-        prompt (and the reasoning_gym SYSTEM_PROMPTS convention) instructs the
-        model to answer inside ``<answer>...</answer>`` tags — so the boxed
-        extractor never matched and EVERY rg task scored 0.0 regardless of
-        correctness. We extract the ``<answer>`` payload (the format the prompt
-        asks for; e.g. the JSON coloring map for graph_color) and pass it to
-        ``score_answer``. Falls back to ``\\boxed{}`` for the
-        RG_USE_BOXED_PROMPT path.
+        The question asks for the final answer in ``\\boxed{}`` (see reset()
+        and the rg prompt in gem_evaluator), so the last ``\\boxed{}`` is the
+        answer. Models that still use reasoning_gym's ``<answer>`` tags are
+        scored on the tag payload, with a ``\\boxed{}`` inside it unwrapped:
+        grading ``<answer>\\boxed{x}</answer>`` verbatim marked correct
+        answers wrong.
         """
-        matches = re.findall(
-            r"<answer>\s*(.*?)\s*</answer>", action, re.DOTALL | re.IGNORECASE
-        )
-        if matches:
-            clean_action = matches[-1].strip()
-        else:
-            clean_action = extract_last_boxed_answer(action)
-        reward = self.reward_fn(answer=clean_action, entry=self.data)
-        return TERMINAL_STATE, reward, True, True, {}
+        if rg_protocol() is not None:
+            extracted = _nemo_gym_extract(action)
+            score = self._score(extracted)
+            dump_path = os.environ.get("RG_DUMP")
+            if dump_path:
+                with open(dump_path, "a") as f:
+                    f.write(json.dumps({
+                        "task": self.name, "score": score, "gold": str(self.data["answer"]),
+                        "extracted": extracted[:2000], "response": action,
+                    }) + "\n")
+            return TERMINAL_STATE, score, True, True, {}
+        clean_action = extract_last_boxed_answer(action)
+        if clean_action is None:
+            matches = re.findall(
+                r"<answer>\s*(.*?)\s*</answer>", action, re.DOTALL | re.IGNORECASE
+            )
+            if matches:
+                clean_action = matches[-1].strip()
+        if clean_action is not None:
+            clean_action = clean_action.strip()
+        return TERMINAL_STATE, self._score(clean_action), True, True, {}
+
+    def _score(self, answer: Optional[str]) -> float:
+        try:
+            return float(self.reward_fn(answer=answer, entry=self.data))
+        except Exception:  # noqa: BLE001
+            # Some scorers raise on answers they cannot parse (prime_factorization
+            # on "2 \\times 3"); that is a wrong answer, not a failed episode,
+            # which the evaluator would drop from win_rate.
+            return 0.0
 
     def spawn(self, same_state: bool = False, **kwargs: Any) -> Env:
         merged_kwargs = {**self._extra_kwargs, **kwargs}
@@ -178,9 +232,9 @@ for _env_id, (_entry_point, _kwargs) in _SPADE_CUSTOM_ENVS.items():
 
 def _register_rg_hard_split() -> int:
     """Register Reasoning-Gym's Appendix A.3 hard configuration."""
-    from spade.core.eval.rg_a3_hard import A3_HARD_CONFIGS
+    from spade.core.eval.rg_a3_hard import load_split
     n = 0
-    for name, params in A3_HARD_CONFIGS.items():
+    for name, params in load_split("hard").items():
         env_id = f"rg:{name}-hard"
         if env_id in ENV_REGISTRY:
             continue
@@ -196,7 +250,44 @@ def _register_rg_hard_split() -> int:
     return n
 
 
-_register_rg_hard_split()
+try:
+    _register_rg_hard_split()
+except RgSplitUnavailable as _e:
+    logger.error("[RG] no rg: envs registered -- %s", _e)
+
+
+
+
+def _register_rg_gg_split() -> int:
+    """Register ``rg:<dataset>-gg``: the Golden Goose protocol subset.
+
+    Same A.3 hard configs as ``rg:<dataset>-hard``, restricted to the 79 tasks
+    base Qwen3-4B-Instruct-2507 does not saturate. The subset is only valid for
+    the purposes set out in eval_offline/configs/rg_hard_split.README.md -- use
+    the ``-hard`` ids for published comparisons and base-vs-finetune deltas.
+    """
+    from spade.core.eval.rg_a3_hard import load_split
+    n = 0
+    for name, params in load_split("golden_goose").items():
+        env_id = f"rg:{name}-gg"
+        if env_id in ENV_REGISTRY:
+            continue
+        try:
+            gem_register(
+                env_id, "spade.core.envs.gem_adapter:SpadeReasoningGymEnv",
+                name=name, seed=42, **params,
+            )
+            n += 1
+        except Exception as e:  # noqa: BLE001
+            logger.warning("[RG] could not register %s at A.3 hard config: %s", env_id, e)
+    logger.info("[RG] registered %d rg:<task>-gg envs (Golden Goose subset of A.3 hard)", n)
+    return n
+
+
+try:
+    _register_rg_gg_split()
+except RgSplitUnavailable as _e:
+    logger.error("[RG] no rg: envs registered -- %s", _e)
 
 # Use no-replacement sampling and complete test execution for CodeContest.
 # Direct assignment preserves the existing task ID and metric key.

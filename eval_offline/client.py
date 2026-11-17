@@ -52,7 +52,7 @@ class OfflineClient:
         self._sems_by_loop_id: dict[int, asyncio.Semaphore] = {}
         http_client = httpx.AsyncClient(
             follow_redirects=True,
-            timeout=httpx.Timeout(connect=30.0, read=600.0, write=60.0, pool=60.0),
+            timeout=httpx.Timeout(connect=30.0, read=7200.0, write=60.0, pool=60.0),
         )
         # Keyless SGLang endpoints ignore the token ("EMPTY" is fine), but
         # authenticated APIs need a real bearer key. When the caller left the

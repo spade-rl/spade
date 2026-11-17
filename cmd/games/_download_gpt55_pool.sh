@@ -4,7 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
 
 HF_DATASET="${HF_DATASET:-spare-rl/spare-gpt55-static-corpus}"
-HF_DATASET_REVISION="${HF_DATASET_REVISION:-e179a371bc7764dacf0bcee1f808100beb463137}"
+HF_DATASET_REVISION="${HF_DATASET_REVISION:-383e4512938c148a7bef2e72b985075eea180647}"
 DATASET_ROOT="${DATASET_ROOT:-/scratch/spare-gpt55-static-corpus}"
 
 if [[ "${SKIP_DATASET_DOWNLOAD:-0}" == "1" ]]; then

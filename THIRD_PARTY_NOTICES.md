@@ -35,7 +35,7 @@ recorded when they were copied.
 
 The paper's 7,872-game GPT-5.5 pool is released under Apache-2.0 at
 [`spare-rl/spare-gpt55-static-corpus`](https://huggingface.co/datasets/spare-rl/spare-gpt55-static-corpus),
-revision `e179a371bc7764dacf0bcee1f808100beb463137`. Other paper grounding
+revision `383e4512938c148a7bef2e72b985075eea180647`. Other paper grounding
 corpora are not bundled. Their authoritative public snapshots, checksums,
 licenses, and redistribution terms remain unresolved and must not be inferred
 from the SPADE source license.
