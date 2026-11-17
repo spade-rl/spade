@@ -86,7 +86,7 @@ eval = [
   # GEM benchmark runtime for the games config (GPQA/LCB/Reasoning-Gym run
   # through spade.core.eval.GemEvaluator; import name `gem`).
   "gem-llm",
-  "reasoning-gym",
+  "reasoning-gym==0.1.23",  # A.3 hard configs are version-sensitive (param names)
   # \boxed{} answer scoring (AIME, GPQA); antlr pin is math_verify's LaTeX
   # parser backend.
   "math_verify",

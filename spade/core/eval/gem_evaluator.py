@@ -21,6 +21,7 @@ import gem
 
 import spade.core.envs.gem_adapter  # noqa: F401 — registers custom envs before gem.make()
 from spade.core.eval.gem_tasks import GemTaskSpec, rg_golden_goose_category
+from spade.core.envs.gem_adapter import rg_protocol
 from spade.core.model_adapter import ModelAdapter
 from spade.core.utils import get_token_delta
 
@@ -91,10 +92,9 @@ def _build_initial_prompt(
 ) -> str:
     """Build category-appropriate initial prompt.
 
-    For `rg` (reasoning_gym) tasks, follows the RG paper prompt
-    (`reasoning_gym/utils.py:SYSTEM_PROMPTS["default"]`) but asks for the
-    answer in `\\boxed{}`, matching the env's own instruction and the scorer
-    in SpadeReasoningGymEnv.step().
+    For `rg` (reasoning_gym) tasks, follows the RG paper prompt but asks for
+    the answer in `\\boxed{}`, matching the env's own instruction and the
+    scorer in SpadeReasoningGymEnv.step().
 
     For multiple-choice tasks (e.g., GPQA-Diamond) Qwen3-4B-Instruct-2507
     model card recommends MCQ JSON format (`"answer": "C"`). Two ways to opt-in:
@@ -162,6 +162,10 @@ def _build_initial_prompt(
             f"Question: {observation}\n"
             "Please reason step by step, and put your final answer within \\boxed{{}}."
         )
+    if category == "rg" and rg_protocol() is not None:
+        # The Golden Goose protocol sends the reasoning_gym question as is; the
+        # env has already appended the \boxed{} instruction in reset().
+        return observation
     if category == "rg":
         # The observation already ends with "Put your final answer within
         # \boxed{}." (SpadeReasoningGymEnv.reset); asking for <answer> tags as
@@ -236,6 +240,7 @@ class GemEvaluator:
             raise
 
         max_context = task_spec.max_context  # prompt + generation cap per episode
+        rg_proto = task_spec.category == "rg" and rg_protocol() is not None
 
         try:
             obs, info = env.reset(seed=episode_idx)
@@ -245,7 +250,8 @@ class GemEvaluator:
                 obs = obs + "\n" + suffix
             total_reward = 0.0
 
-            messages: List[Dict[str, str]] = [
+            messages: List[Dict[str, str]] = []
+            messages += [
                 {
                     "role": "user",
                     "content": _build_initial_prompt(
@@ -290,9 +296,10 @@ class GemEvaluator:
                     messages=messages,
                     input_ids=all_tokens,
                     temperature=task_spec.temperature,
-                    # Qwen3 non-thinking sampling from the model card.
-                    top_p=0.8,
-                    top_k=20,
+                    # Qwen3 non-thinking sampling from the model card; the
+                    # Golden Goose protocol samples at top_p 0.95, no top-k.
+                    top_p=0.95 if rg_proto else 0.8,
+                    top_k=-1 if rg_proto else 20,
                     min_p=0.0,
                     presence_penalty=0.0,
                     max_tokens=gen_max_tokens,

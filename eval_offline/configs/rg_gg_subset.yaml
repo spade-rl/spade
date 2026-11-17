@@ -1,0 +1,97 @@
+# Golden Goose protocol, 79-task SUBSET of the A.3 hard split: the tasks base
+# Qwen3-4B-Instruct-2507 saturates are removed. Run with RG_PROTOCOL=boxed.
+# Selection rule and what may NOT be claimed from it:
+#   eval_offline/configs/rg_hard_split.README.md
+# Use games.yaml (all 100 rg:*-hard) for anything compared against
+# reasoning_gym's or Golden Goose's published numbers, or for base-vs-finetune
+# deltas.
+suites:
+  gem:
+    defaults:
+      episodes: 16
+      max_turns: 1
+      temperature: 0.6
+      max_tokens: 32768
+      max_context: 36864
+      generation_timeout: 7200
+      max_concurrent: 64
+    tasks:
+      - { task_id: "rg:intermediate_integration-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:polynomial_equations-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:polynomial_multiplication-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:simple_equations-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:simple_integration-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:basic_arithmetic-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:bitwise_arithmetic-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:calendar_arithmetic-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:decimal_arithmetic-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:decimal_chain_sum-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:dice-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:fraction_simplification-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:lcm-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:leg_counting-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:power_function-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:products-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:time_intervals-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:advanced_geometry-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:course_schedule-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:family_relationships-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:largest_island-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:shortest_path-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:ab-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:base_conversion-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:binary_alternation-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:binary_matrix-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:caesar_cipher-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:count_primes-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:cryptarithm-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:game_of_life-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:graph_color-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:group_anagrams-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:isomorphic_strings-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:letter_jumble-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:manipulate_matrix-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:number_filtering-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:number_sorting-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:palindrome_generation-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:palindrome_partitioning-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:pool_matrix-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:ransom_note-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:rotate_matrix-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:rotten_oranges-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:sentence_reordering-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:spiral_matrix-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:string_insertion-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:string_manipulation-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:string_splitting-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:string_synthesis-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:word_ladder-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:word_sequence_reversal-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:word_sorting-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:bf-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:codeio-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:arc_1d-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:arc_agi-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:rearc-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:color_cube_rotation-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:figlet_font-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:modulo_grid-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:rectangle_count-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:rubiks_cube-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:countdown-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:emoji_mystery-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:futoshiki-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:mahjong_puzzle-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:maze-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:mini_sudoku-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:n_queens-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:rush_hour-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:sokoban-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:sudoku-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:tower_of_hanoi-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:acre-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:list_functions-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:aiw-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:circuit_logic-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:propositional_logic-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
+      - { task_id: "rg:self_reference-gg", episodes: 16, max_turns: 1, temperature: 0.6, max_tokens: 32768, max_context: 36864, generation_timeout: 7200 }
